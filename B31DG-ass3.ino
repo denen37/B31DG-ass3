@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include <inttypes.h>   // ✅ FIX: required for PRIu32, PRIi64
+#include <inttypes.h>
 #include <Arduino.h>
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
@@ -29,7 +29,7 @@
 #define PERIOD_D   pdMS_TO_TICKS(50)
 #define PERIOD_S    pdMS_TO_TICKS(30)
 
-#define FINAL_REPORT_AFTER_SECONDS 10   // ✅ FIX: added
+#define FINAL_REPORT_AFTER_SECONDS 10   
 
 // ─── Shared tokens ──────────────────────────────────────────────────
 volatile uint32_t tokenA   = 0;
@@ -241,7 +241,6 @@ class TimingMonitor {
 
 
 
-// ✅ FIX: create global instance
 TimingMonitor g_monitor;
 
 
@@ -262,7 +261,7 @@ void IRAM_ATTR handle_SYNC() {
     if (!fired) {
         fired = true;
 
-        startMonitoringTime = xTaskGetTickCountFromISR(); // ✅ FIX
+        startMonitoringTime = xTaskGetTickCountFromISR();
 
         g_monitor.synch();
 
@@ -285,7 +284,7 @@ void IRAM_ATTR handle_S() {
 
     xSemaphoreGiveFromISR(semS, &xHigherPriorityTaskWoken);
 
-    g_monitor.notifySRelease();   // ✅ FIX
+    g_monitor.notifySRelease();  
 
     portYIELD_FROM_ISR(xHigherPriorityTaskWoken);
 }
@@ -318,7 +317,7 @@ void vTaskA(void *pvParameters) {
         uint32_t result = WorkKernel(672000, seed);
 
         xSemaphoreTake(tokenMutex, portMAX_DELAY);
-        tokenA = result;                 // ✅ FIX (protected write)
+        tokenA = result;                
         xSemaphoreGive(tokenMutex);
 
         digitalWrite(ACK_A, LOW);
@@ -353,7 +352,7 @@ void vTaskB(void *pvParameters) {
         uint32_t result = WorkKernel(672000, seed);
 
         xSemaphoreTake(tokenMutex, portMAX_DELAY);
-        tokenB = result;                 // ✅ FIX
+        tokenB = result;                 
         xSemaphoreGive(tokenMutex);
 
         digitalWrite(ACK_B, LOW);
@@ -407,7 +406,7 @@ void vTaskC(void *pvParameters) {
             uint32_t result = WorkKernel(1680000, seedC);
 
             xSemaphoreTake(tokenMutex, portMAX_DELAY);
-            tokenC = result;                      // ✅ protected write
+            tokenC = result;                      
             xSemaphoreGive(tokenMutex);
 
             digitalWrite(ACK_C, LOW);
@@ -441,7 +440,7 @@ void vTaskD(void *pvParameters) {
             uint32_t result = WorkKernel(960000, seedD);
 
             xSemaphoreTake(tokenMutex, portMAX_DELAY);
-            tokenD = result;                      // ✅ protected write
+            tokenD = result;                      
             xSemaphoreGive(tokenMutex);
 
             digitalWrite(ACK_D, LOW);
@@ -482,7 +481,7 @@ void vTaskD(void *pvParameters) {
 
     void vPrintReport(void *pvParameters) {
 
-    for (;;) {   // ✅ FIX: must loop
+    for (;;) {   
 
         if (startMonitoringTime != 0) {
 
@@ -502,7 +501,7 @@ void vTaskD(void *pvParameters) {
             }
         }
 
-        vTaskDelay(pdMS_TO_TICKS(10)); // ✅ prevent CPU hogging
+        vTaskDelay(pdMS_TO_TICKS(10)); 
     }
 }
 
