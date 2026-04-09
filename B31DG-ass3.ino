@@ -375,17 +375,20 @@ void vTaskAGG(void *pvParameters) {
     xSemaphoreGive(semSyncStart); 
     for (;;) { 
         xSemaphoreTake(semAforAGG, portMAX_DELAY);
-         xSemaphoreTake(semBforAGG, portMAX_DELAY);
-          uint32_t localA, localB;
-           xSemaphoreTake(tokenMutex, portMAX_DELAY);
-            localA = tokenA;
-             localB = tokenB; 
-             xSemaphoreGive(tokenMutex);
-              uint32_t agg = (localA != 0 && localB != 0) ? (localA ^ localB) : 0xDEADBEEF; uint32_t seed = (IDAGG << 16) ^ agg ^ 0xD4; 
-              g_monitor.beginTaskAGG(IDAGG); digitalWrite(ACK_AGG, HIGH); tokenAGG = WorkKernel(480000, seed); digitalWrite(ACK_AGG, LOW); g_monitor.endTaskAGG();
-               Serial.printf("AGG,%u,%u,%u\n", IDAGG, agg, tokenAGG); 
-               IDAGG++; 
-        } 
+        xSemaphoreTake(semBforAGG, portMAX_DELAY);
+        uint32_t localA, localB;
+     
+        xSemaphoreTake(tokenMutex, portMAX_DELAY);
+        localA = tokenA;
+        localB = tokenB; 
+        xSemaphoreGive(tokenMutex);
+     
+        uint32_t agg = (localA != 0 && localB != 0) ? (localA ^ localB) : 0xDEADBEEF; uint32_t seed = (IDAGG << 16) ^ agg ^ 0xD4; 
+        g_monitor.beginTaskAGG(IDAGG); digitalWrite(ACK_AGG, HIGH); tokenAGG = WorkKernel(480000, seed); digitalWrite(ACK_AGG, LOW); g_monitor.endTaskAGG();
+     
+        Serial.printf("AGG,%u,%u,%u\n", IDAGG, agg, tokenAGG); 
+        IDAGG++; 
+      } 
 } 
 
 // Task C – period 50 ms, priority 2
